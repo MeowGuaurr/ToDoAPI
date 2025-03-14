@@ -11,11 +11,16 @@ const getTodos = async (req, res) => {
 };
 
 const addTodo = async (req, res) => {
-  const { task, is_completed } = req.body;  
+  const { task } = req.body;  // Remove is_completed from here
+  
+  if (!task) {
+    return res.status(400).json({ error: 'Task is required' });
+  }
+
   try {
     const result = await client.query(
-      'INSERT INTO todos (task, is_completed) VALUES ($1, $2) RETURNING *', 
-      [task, is_completed] 
+      'INSERT INTO todos (task) VALUES ($1) RETURNING *', 
+      [task]  // Only insert task, database will default is_completed to false
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
